@@ -1,0 +1,140 @@
+---
+title: "Dan testing some RMarkdown"
+author: "Dan W Joyce"
+date: 2019-08-26T21:21:00-00:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+require(ggplot2)
+require(gridExtra)
+require(ggrepel)
+# globals for presentation
+dwjtheme <- theme_minimal() + 
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        plot.title = element_text(size = rel(1.25), face = "bold", hjust = 0.5 ))
+
+```
+
+# A Quick Test
+
+Throughout, we will assume that there are measurements of clinical state, obtained by some instrument, usually with some noise added.  Further, for the purposes of this post, we assume that there is some latent process being measured by these instruments and we use clinical symptoms as a concrete example (but the principles generalise to anything that can be measured and taken to represent state). For pedagogical reasons, the easiest example is to consider just two dimensions - for example, in psychosis, we might measure the positive and negative symptom burden.  
+
+To begin, take a time-ordered set of measurements for positive ($P$) and negative ($N$) symptoms respectively:
+
+$$
+\begin{aligned}
+P &= (29,24,17, \ldots, 12, 11) \\
+N &= (26,24,19, \ldots, 22, 25)
+\end{aligned}
+$$
+
+Graphically, this looks like:
+
+```{r echo = FALSE, fig.align='center', out.width="70%"}
+# demonstration of state space
+p1 <- c( 29, 24, 17, 15, 14, 14, 12, 11 )
+n1 <- c( 26, 24, 19, 22, 24, 25, 22, 25)
+
+df <- data.frame( P = p1,
+                   N = n1,
+                   time = seq(1,8, by = 1)
+)
+
+scaleFUN <- function(x) sprintf("%.0f", x)
+
+# plot one dimensional versions
+p.pos <- ggplot( df, aes( x = time, y = P) ) +
+  geom_point(size = 4, color = "#7570b3") +
+  geom_path(color = "#7570b3") +
+  xlab("\nTime") +
+  ylab("Positive Sx\n") +
+  dwjtheme +
+  theme(legend.position="none")
+
+p.neg <- ggplot( df, aes( x = time, y = N) ) +
+  geom_point(size = 4, color = "#1b9e77") +
+  geom_path( color = "#1b9e77" ) +
+  xlab("\nTime") +
+  ylab("Negative Sx\n") +
+  dwjtheme +
+  theme(legend.position="none")
+
+grid.arrange( p.pos, p.neg, ncol = 2, respect = TRUE)
+```
+
+Individually, we can see that positive symptoms generally decrease over time, but the negative symptoms 'oscillate'.  Next we define a native **state space** where instead of treating the two sequences as independent, we form a vector $x(t) = (p_t, n_t)$ with $p_t \in P$ and $n_t \in N$:
+
+$$
+\begin{aligned}
+x(t) &= \big[ (29,26), (24,24), (17,19), \ldots,(12,22), (11,25)   \big]
+\end{aligned}
+$$
+So, if we want the state at $t=7$ we get $x(7) = (12,22)$ and similarly, $x(2) = (24,24)$.  Each of these states is naturally a point in two dimensions, visualised as a plane: 
+
+```{r echo = FALSE, fig.align='center', out.width="70%"}
+ggplot( df, aes( x = P, y = N ) ) +
+  geom_point(size = 4, color = "#d95f02") +
+  geom_label_repel( aes( x = P, y = N, label = time), nudge_y = -0.05, nudge_x = 0.8, direction = "both" ) +
+  geom_path( color = "#d95f02" ) +
+  scale_y_continuous(labels=scaleFUN, limits = c(18,27) ) +
+  scale_x_continuous(labels=scaleFUN, limits = c(8,33) ) +
+  xlab("\nPositive Sx") +
+  ylab("Negative Sx\n") +
+  dwjtheme +
+  theme(legend.position="none")
+```
+
+In this example, the state space is a finite plane (two-dimensional) which contains *all possible* configurations of $(P,N)$, and a single time-ordered sequence of states (numbered 1 through 8, in orange) shows the state **trejectory** for a single person.  We can equip this state space with a [metric](https://en.wikipedia.org/wiki/Metric_space) that imports mathematical tools for notions such as the distance between two states.  This means we can model the patient's trajectory in this **native** state space (preserving information) and only when we absolutely need to, apply mathematical tools to reduce this multi-dimensional representation to a convenient form that enables us to e.g. inspect change or build statistical models.  
+
+# Dynamical System Approach
+As a starting point, [@nelson2017moving] consider and survey some theoretical proposals for moving toward dynamic (instead of static) models of the *onset* of disorders -- notably, they review dynamical systems and network models.  Similarly, [@mason2017mood] explore a model of how mood oscillations occur in bipolar disorder and their proposal is superifically similar to a dynamical system with periodic behaviour.  The influential work of [@scheffer2009early] is also relevant: if one can identify a latent process with a dynamical systems formulation, then a whole theory of **critical transitions** can be mobilised to explain how perturbations from the system's equilibirum can 'break' the inherent stability of a system leading to a catastrophic change (i.e. relapse).  Our starting point here is how *operationalize* these ideas.  
+
+Here, we assume that underlying the measured clinical state is some process which behaves according to a putative model.  The example used here, and in the literature, is of **damped oscillators**.  A physical analogy helps: imagine a mass attached to a fixed point by a spring.  At rest, this system is in equilibrium.  If the mass is pulled or pushed (displaced) by a certain amount, the system is moved from equilibrium and  will 'bounce' up and down with a frequency and amplitude determined by the amount of displacement, the 'stiffness' of the spring and any 'damping' introduced by the viscosity of the medium.  This has been proposed as a model of e.g. mood dysregulation [@odgers2009capturing] and symptom trajectory is modelled using a [damped oscillator](https://en.wikipedia.org/wiki/Harmonic_oscillator) that is fit to data using for example, regression [@boker2002method].
+
+To begin, we denote the clinical state at time $t$ by $x(t)$ (note this is a uni- rather than multi-variate state representation, so for example, consider only the 'negative symptoms' plot above).  For more discussion of models of damped oscillators, see [@hayek2003] for an applied physical systems discussion, and for a helpful mathematical tutorial, [Chapter 2.4]({https://www.jirka.org/diffyqs/}) of [@Lebl2019diff]. 
+
+A general damped oscillator is described by a linear second-order ordinary differential equation (ODE):
+
+$$
+\frac{d^2x}{dt^2} - \zeta \frac{dx}{dt} - \eta x = 0
+$$
+
+With coefficient $\zeta$ modelling the 'decay' of the oscillations, and $\eta$ describing the 'frequency' of oscillations.
+
+To simplify the presentation, we use 'dot' notation where $\ddot{x}$ and $\dot{x}$ are the second and first derivatives respectively: 
+$$
+\ddot{x}(t) - \zeta \dot{x}(t) - \eta x(t) = 0
+$$
+
+Rearranging for the second-order term:
+$$
+\ddot{x}(t) = \zeta \dot{x}(t) + \eta x(t)
+$$
+Generally, we only have access to numerical data that we suppose is generated from an underlying damped oscillator process; so we use [numerical differentiation](https://en.wikipedia.org/wiki/Numerical_differentiation) to obtain the [locally-linear](https://en.wikipedia.org/wiki/Linear_approximation) approximation to the derivatives of $x$. 
+
+
+You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+fit <- lm(dist ~ speed, data = cars)
+fit
+```
+
+# Including Plots
+
+You can also embed plots. See Figure \@ref(fig:pie) for example:
+
+```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
+par(mar = c(0, 1, 0, 1))
+pie(
+  c(280, 60, 20),
+  c('Sky', 'Sunny side of pyramid', 'Shady side of pyramid'),
+  col = c('#0292D8', '#F7EA39', '#C4B632'),
+  init.angle = -50, border = NA
+)
+```

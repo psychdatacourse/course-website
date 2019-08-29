@@ -1,0 +1,38 @@
+Instructions for creating new content:
+
+1) Add a new "chapter" == adding a directory and a sidebar menu item
+
+	1 -- Navigate to the root (psychdatacourse)
+
+	2 -- hugo new --kind <chaptername>/_index.md
+
+		This creates a directory called <chaptername> and builds a template _index.md
+
+
+2) Open RStudio, open the psychdatacourse project (.Rproj) file
+
+3) Make sure you require(blogdown)
+
+4) In RStudio, with blogdown running:
+
+	1 -- File -> New File -> Create a new R Markdown file in 
+
+		psychdatacourse/content/<chaptername>/
+
+	... and call it <chaptername>-part-X
+
+	... where X is the part number (if in multiple pages/parts)
+
+	2. Ensure that this new file is a .Rmd file (NOT RMarkdown)
+
+5) blogdown::build_site()
+
+6) blogdown::serve_site()
+
+7) Open web browser and navigate to localhost (build_site() shows the http URL for this in the console
+
+7) With the server running, you can then go and edit the .Rmd file and the webpage / site auto updates on each save of the .Rmd
+
+
+
+

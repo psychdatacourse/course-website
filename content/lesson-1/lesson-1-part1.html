@@ -1,0 +1,43 @@
+---
+title: "Clinical State: Part One - Dynamical Systems"
+author: "Dan W Joyce"
+
+output:
+  blogdown::html_page:
+    number_sections: true
+
+header-includes: \usepackage{amsmath}
+image:
+  caption: ''
+  focal_point: ''
+categories: [clinical state, trajectories, dynamical systems]
+# slug: trajectories-part-one
+# substitle: Dynamical Systems
+tags: [state, modelling]
+bibliography: [./traj.bib]
+---
+
+
+
+<p>In this series of blogposts, we look at some models of clinical state. The motivation is to document exploratory work with a colleague (Nick Meyer, who runs the <a href="https://sleepsight.org/">SleepSight</a> study) as we try and apply some theoretical ideas – for example <span class="citation">(Nelson et al. 2017; Scheffer et al. 2009)</span> – to ‘real-life’ data. This problem is interesting because the psychiatric literature more often than not uses an aggregate measure of either state or trajectory, and sometimes, there is no distinction made between the person’s clinical state, a measurement of this state and an ‘outcome’. As examples, most will be familiar with measuring the total (aggregate) score over some scale or instrument (e.g. HAMD in depression, PANSS in psychotic disorders). Often, we measure this at two time-points – such as before and after treatment – and describe the outcome as a change in this aggregated score. Sometimes, we plot a time-series of these total scores, and call this a trajectory. However, this results in a loss of information (see <a href="http://www.danwjoyce.com/clinical-state-models">here</a>) and is driven by the requirement to be compatible with standard (or perhaps more accurately, off-the-shelf) procedures for analysing such data (i.e. defining a discrete ‘response’ / ‘no-response’ univariate outcome for investigating the efficacy/effectiveness of an intervention).</p>
+<div id="basics" class="section level1">
+<h1><span class="header-section-number">1</span> Basics</h1>
+<p>Throughout, we will assume that there are measurements of clinical state, obtained by some instrument, usually with some noise added. Further, for the purposes of this post, we assume that there is some latent process being measured by these instruments and we use clinical symptoms as a concrete example (but the principles generalise to anything that can be measured and taken to represent state). For pedagogical reasons, the easiest example is to consider just two dimensions - for example, in psychosis, we might measure the positive and negative symptom burden.</p>
+<p>To begin, take a time-ordered set of measurements for positive (<span class="math inline">\(P\)</span>) and negative (<span class="math inline">\(N\)</span>) symptoms respectively:</p>
+<p><span class="math display">\[
+\begin{aligned}
+P &amp;= (29,24,17, \ldots, 12, 11) \\
+N &amp;= (26,24,19, \ldots, 22, 25)
+\end{aligned}
+\]</span></p>
+<p>Graphically, this looks like:</p>
+<p><img src="/lesson-1/lesson-1-part1_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /></p>
+<div id="refs" class="references">
+<div id="ref-nelson2017moving">
+<p>Nelson, Barnaby, Patrick D McGorry, Marieke Wichers, Johanna TW Wigman, and Jessica A Hartmann. 2017. “Moving from Static to Dynamic Models of the Onset of Mental Disorder: A Review.” <em>JAMA Psychiatry</em> 74 (5): 528–34.</p>
+</div>
+<div id="ref-scheffer2009early">
+<p>Scheffer, Marten, Jordi Bascompte, William A Brock, Victor Brovkin, Stephen R Carpenter, Vasilis Dakos, Hermann Held, Egbert H Van Nes, Max Rietkerk, and George Sugihara. 2009. “Early-Warning Signals for Critical Transitions.” <em>Nature</em> 461 (7260): 53.</p>
+</div>
+</div>
+</div>

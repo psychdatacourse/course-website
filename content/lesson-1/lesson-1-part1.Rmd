@@ -1,0 +1,100 @@
+---
+title: "Clinical State: Part One - Dynamical Systems"
+author: "Dan W Joyce"
+
+output:
+  blogdown::html_page:
+    number_sections: true
+
+header-includes: \usepackage{amsmath}
+image:
+  caption: ''
+  focal_point: ''
+categories: [clinical state, trajectories, dynamical systems]
+# slug: trajectories-part-one
+# substitle: Dynamical Systems
+tags: [state, modelling]
+bibliography: [./traj.bib]
+---
+
+
+```{r setup, include=FALSE}
+rm( list = ls() )
+
+reqd.packages <- c("ggplot2", 
+                   "ggrepel",
+                   "reshape2",
+                   "latex2exp", 
+                   "deSolve", 
+                   "kableExtra",
+                   "minpack.lm",
+                   "gridExtra",
+                   "pracma",
+                   "viridis")
+
+
+# to install required packages
+todo.packages <- reqd.packages[!(reqd.packages %in% installed.packages()[,"Package"])]
+if(length(todo.packages) > 0) install.packages(todo.packages)
+
+lapply(reqd.packages, require, character.only = TRUE)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+
+# globals for presentation
+dwjtheme <- theme_minimal() + 
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        plot.title = element_text(size = rel(1.25), face = "bold", hjust = 0.5 ))
+
+
+```
+
+In this series of blogposts, we look at some models of clinical state.  The motivation is to document exploratory work with a colleague (Nick Meyer, who runs the [SleepSight](https://sleepsight.org/) study) as we try and apply some theoretical ideas -- for example [@nelson2017moving; @scheffer2009early] -- to 'real-life' data.  This problem is interesting because the psychiatric literature more often than not uses an aggregate measure of either state or trajectory, and sometimes, there is no distinction made between the person's clinical state, a measurement of this state and an 'outcome'.  As examples, most will be familiar with measuring the total (aggregate) score over some scale or instrument (e.g. HAMD in depression, PANSS in psychotic disorders).  Often, we measure this at two time-points -- such as before and after treatment -- and describe the outcome as a change in this aggregated score.  Sometimes, we plot a time-series of these total scores, and call this a trajectory.  However, this results in a loss of information (see [here](http://www.danwjoyce.com/clinical-state-models)) and is driven by the requirement to be compatible with standard (or perhaps more accurately, off-the-shelf) procedures for analysing such data (i.e. defining a discrete 'response' / 'no-response' univariate outcome for investigating the efficacy/effectiveness of an intervention).
+
+# Basics
+Throughout, we will assume that there are measurements of clinical state, obtained by some instrument, usually with some noise added.  Further, for the purposes of this post, we assume that there is some latent process being measured by these instruments and we use clinical symptoms as a concrete example (but the principles generalise to anything that can be measured and taken to represent state). For pedagogical reasons, the easiest example is to consider just two dimensions - for example, in psychosis, we might measure the positive and negative symptom burden.  
+
+To begin, take a time-ordered set of measurements for positive ($P$) and negative ($N$) symptoms respectively:
+
+$$
+\begin{aligned}
+P &= (29,24,17, \ldots, 12, 11) \\
+N &= (26,24,19, \ldots, 22, 25)
+\end{aligned}
+$$
+
+Graphically, this looks like:
+
+```{r echo = FALSE, fig.align='center', out.width="70%"}
+# demonstration of state space
+p1 <- c( 29, 24, 17, 15, 14, 14, 12, 11 )
+n1 <- c( 26, 24, 19, 22, 24, 25, 22, 25)
+
+df <- data.frame( P = p1,
+                   N = n1,
+                   time = seq(1,8, by = 1)
+)
+
+scaleFUN <- function(x) sprintf("%.0f", x)
+
+# plot one dimensional versions
+p.pos <- ggplot( df, aes( x = time, y = P) ) +
+  geom_point(size = 4, color = "#7570b3") +
+  geom_path(color = "#7570b3") +
+  xlab("\nTime") +
+  ylab("Positive Sx\n") +
+  dwjtheme +
+  theme(legend.position="none")
+
+p.neg <- ggplot( df, aes( x = time, y = N) ) +
+  geom_point(size = 4, color = "#1b9e77") +
+  geom_path( color = "#1b9e77" ) +
+  xlab("\nTime") +
+  ylab("Negative Sx\n") +
+  dwjtheme +
+  theme(legend.position="none")
+
+grid.arrange( p.pos, p.neg, ncol = 2, respect = TRUE)
+```

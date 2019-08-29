@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on psychdatacourse 2019</title>
+    <link>/categories/</link>
+    <description>Recent content in Categories on psychdatacourse 2019</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-UK</language>
+    <lastBuildDate>Mon, 26 Aug 2019 21:21:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>R</title>
+      <link>/categories/r/</link>
+      <pubDate>Mon, 26 Aug 2019 21:21:00 +0000</pubDate>
+      
+      <guid>/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>clinical state</title>
+      <link>/categories/clinical-state/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/clinical-state/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dynamical systems</title>
+      <link>/categories/dynamical-systems/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/dynamical-systems/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>trajectories</title>
+      <link>/categories/trajectories/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/trajectories/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

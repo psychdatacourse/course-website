@@ -1,0 +1,40 @@
+baseURL = "/"
+languageCode = "en-UK"
+defaultContentLanguage = "en"
+
+title = "psychdatacourse"
+theme = "hugo-theme-learn"
+metaDataFormat = "yaml"
+defaultContentLanguageInSubdir= true
+
+[params]
+  editURL = ""
+  description = "Psychdatacourse 2019"
+  author = "Dan W Joyce"
+  showVisitedLinks = false
+  disableBreadcrumb = false
+  disableNextPrev = false
+  disableLanguageSwitchingButton = true
+  themeVariant = "green"
+  ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
+
+[Languages]
+[Languages.en]
+title = "psychdatacourse 2019"
+weight = 1
+languageName = "English"
+
+[[Languages.en.menu.shortcuts]]
+name = "<i class='fab fa-fw fa-github'></i> GitHub repo"
+identifier = "ds"
+url = "https://github.com/psychdatacourse"
+weight = 10
+
+[[Languages.en.menu.shortcuts]]
+name = "<i class='fas fa-fw fa-bullhorn'></i> People"
+url = "/people"
+weight = 30
+
